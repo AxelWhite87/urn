@@ -25,7 +25,10 @@ def parse_line():
         return
 
     if id := data[1].isdigit():
-        print(f"Modifying {category} of id {id} with action {line}")
+        if len(data) == 2:
+            print(f"Showing details of {category} with ID {id}")
+        else:
+            print(f"Modifying {category} of ID {id} with action {line}")
     else:
         print(f"Creating {category} of text '{line}'")
 
