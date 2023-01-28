@@ -1,5 +1,6 @@
 import re
 from enum import Enum
+from dataclasses import dataclass
 
 """
 Example commands:
@@ -15,24 +16,23 @@ task 1 modify The hills aren't creepy after all // Updates the text of Fact ID 1
 fact 1 note These hills ain't worth shit
 """
 
+class Category(Enum):
+    FACT = 'fact'
+    TASK = 'task'
+
+
+
 
 def parse_line():
+    """
+    Parses the input and strips elements away one by one.  Once out of elements attempt to do that thing specified.
+    """
     line = input().strip()
     data = line.split(" ")
-    category: str = data[0]
-    if category == line:
-        print(f"List all items from {category}")
-        return
+    category: str = data.pop(0)
 
-    if id := data[1].isdigit():
-        if len(data) == 2:
-            print(f"Showing details of {category} with ID {id}")
-        else:
-            print(f"Modifying {category} of ID {id} with action {line}")
-    else:
-        print(f"Creating {category} of text '{line}'")
-
-    return
+    if category not in [x.value for x in Category]:
+        print("Invalid category!")
 
 
 if __name__ == "__main__":
