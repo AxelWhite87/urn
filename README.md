@@ -1,9 +1,13 @@
 # TODO
 
-- [ ] Make configuration file and have it read in on launch
-- [ ] Set ORM to handle all data storage and handling
-- [ ] CLI commands to interact with the database and handle display
-- [ ] Data export function
+1. Get backend ORM all set for data.
+2. Build out CLI to add, remove, and select data from database.
+3. Build out CLI functions to show data.
+
+# Architecture
+This uses Python's built in CLI + an ORM.
+
+Originally the ORM was Pony, but after some research Peewee might be better suited.
 
 # Command Structure
 
