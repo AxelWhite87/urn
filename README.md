@@ -1,3 +1,10 @@
+# TODO
+
+- [ ] Make configuration file and have it read in on launch
+- [ ] Set ORM to handle all data storage and handling
+- [ ] CLI commands to interact with the database and handle display
+- [ ] Data export function
+
 # Command Structure
 
 All commands are done as follows:
