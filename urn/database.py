@@ -55,14 +55,28 @@ class Track(db.Entity):
     max_value = Required(int)
     text = Required(str)
 
-
+set_sql_debug(True)
 # Generate tables, make them if they're missing
 db.generate_mapping(create_tables=True)
 
 ## Class to hold all functions for interacting with the DB
 @db_session
-class DBContext:
+class CliContext:
     """Functions for interacting with the database"""
+
+    game_context: Game
+
+    def add_game(self, name: str):
+        """
+        Create new game
+
+        Attributes
+        ----------
+        text: str
+            The name of the game
+        """
+        new_game = Game(name=name)
+        print(f"Created new game '{new_game.name}'")
 
     def add_fact(self, text: str, game: Game):
         """
@@ -75,9 +89,9 @@ class DBContext:
         game: Game
             The Game object the Fact is linked to
         """
-        new_id = max(f.id for f in Fact) + 1 # Get the max value of Facts
+        new_id = max(f.id for f in Fact) + 1 if count(f for f in Fact) else 1# Get the max value of Facts
         new_fact = Fact(simple_id=new_id, text=text, game=game)
-        return new_fact.id
+        print(f"Created new fact with ID {new_fact.simple_id}")
 
 
     def delete_fact(self, id: int) -> None:
@@ -90,9 +104,10 @@ class DBContext:
             The fact object you are trying to delete
         """
         try:
-            deleted_simple_id = Fact[id].simple_id
-            Fact[id].delete()
-            facts_to_update: Fact = select(f for f in Fact if f.simple_id > deleted_simple_id)
+            fact_to_delete: Fact = Fact.get(simple_id=id)
+            deleted_simple_id = fact_to_delete.simple_id
+            fact_to_delete.delete()
+            facts_to_update: list[Fact] = select(f for f in Fact if f.simple_id > deleted_simple_id)
             for f in facts_to_update:
                 f.simple_id -= 1 
             print(f"Deleted fact {id}")
@@ -112,7 +127,7 @@ class DBContext:
             A list of modifications to perform
         """
         # Get the Fact to update
-        fact = Fact.get(simple_id=id)
+        fact: Fact = Fact.get(simple_id=id)
 
         # Kill if it doesn't exist
         if fact == None:
@@ -120,15 +135,25 @@ class DBContext:
             return
 
         for m in modifiers:
+            # Start with checking for tags
             if m.startswith("+") or m.startswith("-"):
                 tag_modifier: str = m.pop(0)
                 tag = self.find_or_create_tag(m)
                 if tag_modifier == "+":
                     # Check if already has tag
-                    pass
+                    if tag in fact.tags:
+                        print(f"Fact {fact.simple_id} already has tag {tag.text}")
+                    else:
+                        fact.tags.add(tag)
+                        print(f"Added {tag.text} to {fact.simple_id}")
                 else:
                     # Check if already doesn't have tag
-                    pass
+                    if tag not in fact.tags:
+                        print(f"Fact {fact.id} already does not have tag {tag.text}")
+                    else:
+                        fact.tags.remove(tag)
+                        print(f"Removed {tag.text} from {fact.simple_id}")
+            # Next we check for links
 
 
     def find_or_create_tag(self, text: str) -> Tag:
