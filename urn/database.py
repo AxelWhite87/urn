@@ -5,13 +5,6 @@ from pony.orm import *
 db = Database('sqlite', ':memory:')
 
 # List out our model classes
-class Game(db.Entity):
-    id = PrimaryKey(UUID, auto=True)
-    name = Required(str, unique=True)
-    facts = Set('Fact')
-    tasks = Set('Task')
-
-
 class Fact(db.Entity):
     """Description of a discrete thing"""
     id = PrimaryKey(UUID, auto=True)
@@ -22,6 +15,13 @@ class Fact(db.Entity):
     tags = Set('Tag')
 
 
+class Game(db.Entity):
+    id = PrimaryKey(UUID, auto=True)
+    name = Required(str, unique=True)
+    facts = Set(Fact)
+    tasks = Set('Task')
+
+
 class Tag(db.Entity):
     id = PrimaryKey(UUID, auto=True)
     text = Required(str, unique=True)
@@ -30,6 +30,7 @@ class Tag(db.Entity):
 
 
 class Task(db.Entity):
+    """Tasks to accomplish"""
     id = PrimaryKey(UUID, auto=True)
     simple_id = Required(int, unique=True)
     text = Required(str)
@@ -37,6 +38,7 @@ class Task(db.Entity):
     game = Required(Game)
     notes = Set('Note')
     tags = Set(Tag)
+    tracks = Set('Track')
 
 
 class Note(db.Entity):
@@ -44,6 +46,14 @@ class Note(db.Entity):
     text = Optional(str)
     fact = Optional(Fact)
     task = Optional(Task)
+
+
+class Track(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    task = Optional(Task)
+    current_value = Required(int, sql_default='0')
+    max_value = Required(int)
+    text = Required(str)
 
 
 # Generate tables, make them if they're missing
@@ -54,7 +64,7 @@ db.generate_mapping(create_tables=True)
 class DBContext:
     """Functions for interacting with the database"""
 
-    def add_fact(text: str, game: Game):
+    def add_fact(self, text: str, game: Game):
         """
         Add a new Fact to the database.
 
@@ -70,7 +80,7 @@ class DBContext:
         return new_fact.id
 
 
-    def delete_fact(id: int) -> None:
+    def delete_fact(self, id: int) -> None:
         """
         Delete a fact from the database.
 
@@ -90,7 +100,7 @@ class DBContext:
             print(f"Unable to delete this fact ID {id}.  Reason: {e}")
 
 
-    def modify_fact(id: int, modifiers: list[str]) -> None:
+    def modify_fact(self, id: int, modifiers: list[str]) -> None:
         """
         Modify a fact in the database
 
@@ -110,6 +120,25 @@ class DBContext:
             return
 
         for m in modifiers:
-            if m.startswith("+"):
+            if m.startswith("+") or m.startswith("-"):
+                tag_modifier: str = m.pop(0)
+                tag = self.find_or_create_tag(m)
+                if tag_modifier == "+":
+                    # Check if already has tag
+                    pass
+                else:
+                    # Check if already doesn't have tag
+                    pass
 
 
+    def find_or_create_tag(self, text: str) -> Tag:
+        """
+        Find a tag based on it's text or create it
+
+        Attributes
+        ----------
+        text: str
+            The text of the string
+        """
+        tag = Tag.get(text=text)
+        return tag if tag != None else Tag(text=text)
