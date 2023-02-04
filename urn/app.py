@@ -26,6 +26,11 @@ def delete_and_set_d_id(entry_type: str, id: int) -> None:
     db.update(decrement('d_id'), query.d_id > id) 
     print(f"{entry_type} {id} deleted.")
 
+
+def find_by_category(entry_type: str, query_string: str):
+    return [e for e in db.search(query.matches('^query_string')) if e.type == entry_type]
+
+
 def entry():
     db.insert({'type': 'fact', 'd_id': 1, 'text': 'I am a fact', 'notes': ['Note 1', 'Note 2']})
     db.insert({'type': 'task', 'd_id': 1, 'text': 'I am a second fact', 'isDone': False})
