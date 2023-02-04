@@ -10,6 +10,7 @@ python = "^3.10"
 sqlalchemy = "^2.0.0"
 docopt = "^0.6.2"
 pony = "^0.7.16"
+tinydb = "^4.7.1"
 
 
 [build-system]

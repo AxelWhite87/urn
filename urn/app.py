@@ -1,50 +1,55 @@
-import re
-from enum import Enum
-from dataclasses import dataclass
+from tinydb import TinyDB, Query
+from tinydb.storages import MemoryStorage
+from tinydb.operations import decrement
+from typing import Union
 
-class Category(Enum):
-    FACT = 'fact'
-    TASK = 'task'
+# db = TinyDb('urn.json')
+db = TinyDB(storage=MemoryStorage)
 
-def parse_line():
-    """
-    Parses the input and strips elements away one by one.  Once out of elements attempt to do that thing specified.
-    """
-    line = input().strip() # Get line input from user
-    data: list[str] = line.split(" ") # Split the line based on spaces so we can get keywords out of it
-    category: str = data.pop(0) # Since the first word is always the category we're affecting, snag it
-    id: int = -1 # Hold the ID of a thing; -1 indicates no thing was passed
-    modifiers: list[str] = [] # Hold any modifiers
-    tags: list[str] = []
-    action: str = "" # The action you want to do
+query = Query()
 
-    # Check if it's a valid category, if not kill the function
-    if category not in [x.value for x in Category]:
-        print("Invalid category!")
-        return
 
-    # If after removing the category the next item is an integer, remove it, cast it to int, and assign it to id
-    if data[0].isdigit():
-        id = int(data.pop(0))
+def find_by_type(entry_type: str):
+    if entry_type not in ['fact', 'task', 'track']:
+        print("Invalid type supplied")
+        return 
+    return db.search(query.type == entry_type)
 
-    # At this point if the first term in the list is an action term and we have an ID, grab it and assign it
-    if data[0] in ['modify', 'note', 'done', 'purge']:
-        if id > -1: 
-            action = data.pop(0)
-        else:
-            print("Action needs an ID, please try again.")
-            return
+def entry():
+    db.insert({'type': 'fact', 'd_id': 1, 'text': 'I am a fact', 'notes': ['Note 1', 'Note 2']})
+    db.insert({'type': 'task', 'd_id': 2, 'text': 'I am a second fact'})
+    db.insert({'type': 'fact', 'd_id': 3, 'text': 'Yep yep yep', 'tags': ['evil']})
+    db.insert({'type': 'fact', 'd_id': 4, 'text': 'Yep yep yep', 'tags': ['evil']})
+    db.insert({'type': 'fact', 'd_id': 5, 'text': 'Yep yep yep', 'tags': ['evil']})
+    db.insert({'type': 'fact', 'd_id': 6, 'text': 'Yep yep yep', 'tags': ['evil']})
 
-    # Loop through all terms and remove and assign any modifiers and tags
-    for term in data:
-        if term.startswith("+") or term.startswith("-"):
-            tags.append(term)
-            data.remove(term)
-        elif ":" in term:
-            modifiers.append(term)
-            data.remove(term)
+    # Get and print every entry with type of 'fact'
+    # for result in db.search(query.type == 'fact'):
+    #     print(result)
+
+    # Same as above but in it's own function
+    # print(find_by_type('task'))
+
+    # Get an entry by it's ID and print it's first attached note
+    # fact1 = db.get(doc_id=1)
+    # print(fact1['notes'][0])
+
+    # Find all entries that do not have the tag 'evil'
+    # tag_test = db.search(~ query.tags.any(['evil']))
+    # for t in tag_test:
+    #     print(t)
+
+    # Remove an entry and then decrement d_id of all subsequent entries
+    print(db.all())
+    db.remove(doc_ids=[3])
+    db.update(decrement('d_id'), query.d_id > 3)
+    print(db.all())
+
+
 
 
 
 if __name__ == "__main__":
-    parse_line()
+    entry()
+
+
