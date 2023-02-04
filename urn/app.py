@@ -2,8 +2,10 @@ from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 from tinydb.operations import decrement, set
 from typing import Union
+from tabulate import tabulate
+import time
 
-# db = TinyDb('urn.json')
+# db = TinyDB('urn.json')
 db = TinyDB(storage=MemoryStorage)
 
 query = Query()
@@ -64,7 +66,11 @@ def entry():
     # for e in db.search(query.type == 'fact'):
     #     print(e)
 
-    print(db.search(query.type == 'task'))
+    # print(db.search(query.type == 'task'))
+    btime = time.time()
+    # With an in memory DB this is _fast_.
+    print(tabulate(db.search(query.type == 'fact')))
+    print(f"Get + format elapsed = {time.time() - btime}")
 
 
 
