@@ -28,7 +28,7 @@ def delete_and_set_d_id(entry_type: str, id: int) -> None:
 
 
 def find_by_category(entry_type: str, query_string: str):
-    return [e for e in db.search(query.matches('^query_string')) if e.type == entry_type]
+    return db.search( (query.matches('^query_string')) & (query.type == entry_type) )
 
 
 def entry():
@@ -74,7 +74,8 @@ def entry():
     # print(db.search(query.type == 'task'))
     btime = time.time()
     # With an in memory DB this is _fast_.
-    print(tabulate(db.search(query.type == 'fact')))
+    # print(tabulate(db.search(query.type == 'fact')))
+    print(tabulate(db.all(), headers="keys"))
     print(f"Get + format elapsed = {time.time() - btime}")
 
 
