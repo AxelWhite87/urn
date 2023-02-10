@@ -2,6 +2,7 @@ from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 from tinydb.operations import set
 from tabulate import tabulate
+from multipledispatch import dispatch
 
 db = TinyDB(storage=MemoryStorage)
 q = Query()
@@ -18,8 +19,14 @@ def set_display_ids(type: str) -> None:
 def show_all():
     print(tabulate(db.all()))
 
-def get(type: str, id: int):
+
+@dispatch(str, int)
+def get(type: str, id: int) -> None:
     print(db.get(q.type == type and q.display_id == id))
+
+@dispatch(str)
+def get(type: str) -> None:
+    print(db.search(q.type == type))
 
 
 def add_item(type: str, text: str) -> None:
@@ -55,8 +62,13 @@ while True:
             continue
 
         case 'fact':
-          if not data[0]:
-
+            if not data[0]:
+                get('fact')
+                continue
+            if data[0].isdigit():
+                get('fact', data[0])
+                continue
+            
         case 'exit':
             print("Bye")
             break
