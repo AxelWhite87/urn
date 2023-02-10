@@ -1,8 +1,19 @@
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
+from tinydb.operations import set
 from tabulate import tabulate
 
 db = TinyDB(storage=MemoryStorage)
+q = Query()
+
+
+def set_display_ids(type: str) -> None:
+    counter = 1
+    for entry in db.search(q.type == type):
+        print(entry.doc_id)
+        db.update(set('display_id', counter), doc_ids=[entry.doc_id]) 
+        counter += 1
+
 
 def show_all():
     print(tabulate(db.all()))
@@ -18,6 +29,7 @@ def add_item(type: str, text: str):
         'type': type,
         'text': text
         })
+    set_display_ids(type)
     print(f"{type} {new_item_id} created.")
 
 
@@ -38,3 +50,6 @@ while True:
         case 'exit':
             print("Bye")
             break
+        case other:
+            print("Command not recognized.")
+            continue
