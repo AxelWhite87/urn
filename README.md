@@ -4,10 +4,26 @@
 2. Build out CLI to add, remove, and select data from database.
 3. Build out CLI functions to show data.
 
-# Architecture
-This uses Python's built in CLI + an ORM.
+# Architecture and Concept
+The idea behind this is to capture notes during a live RPG sessions atomically as they happen in as natural a way possible.
 
-Originally the ORM was Pony, but after some research Peewee might be better suited.
+Adding a note should be effortless.  So should retrieving one.  A simple syntax provides an interface to all your knowledge about a game.
+
+Chronological notetaking can be accomplished by querying the timestamps on items.
+
+Every item in the database is either a FACT or a TASK.
+
+A FACT is a single conrete thing in the story.  For instance a character, a location, or a plot point.
+
+A TASK is a goal to accomplish, either one of your character's or another in the setting.  Within the architecture, the only difference between a task and a fact is a task has a boolean on it that tells if it's done or not.
+
+Each of these can have any number of NOTES, ATTRIBUTES, or LINKS
+
+A NOTE is a single line that adds extra information to a fact or task.
+
+An ATTRIBUTE is a key:value pair that describes something about the item.  It can be queried, for instance get strength of a character.
+
+A LINK is a link between any item.  Such as two characters who know each other, a character involved in an ongoing plot point, etc.
 
 # Command Structure
 
