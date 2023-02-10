@@ -18,6 +18,9 @@ def set_display_ids(type: str) -> None:
 def show_all():
     print(tabulate(db.all()))
 
+def get(type: str, id: int):
+    print(db.get(q.type == type and q.display_id == id))
+
 
 def add_item(type: str, text: str) -> None:
     type = type.strip()
@@ -45,13 +48,19 @@ while True:
         case 'show':
             show_all()
             continue
+
         case 'add':
             type = data.pop(0)
             add_item(type, " ".join(data))
             continue
+
+        case 'fact':
+          if not data[0]:
+
         case 'exit':
             print("Bye")
             break
+
         case other:
             print("Command not recognized.")
             continue
