@@ -19,7 +19,7 @@ def show_all():
     print(tabulate(db.all()))
 
 
-def add_item(type: str, text: str):
+def add_item(type: str, text: str) -> None:
     type = type.strip()
     text = text.strip()
     if type not in ['fact', 'task']:
@@ -29,6 +29,8 @@ def add_item(type: str, text: str):
         'type': type,
         'text': text
         })
+    if type == "task":
+        db.update(set('isDone', False), doc_ids=[new_item_id])
     set_display_ids(type)
     print(f"{type} {new_item_id} created.")
 
