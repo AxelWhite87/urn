@@ -62,11 +62,11 @@ while True:
             continue
 
         case 'fact':
-            if not data[0]:
+            if not data:
                 get('fact')
                 continue
             if data[0].isdigit():
-                get('fact', data[0])
+                get('fact', int(data[0]))
                 continue
             
         case 'exit':
